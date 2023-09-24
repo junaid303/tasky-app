@@ -1,3 +1,4 @@
+import { error } from "console";
 import fs from "fs";
 /*
  The generate_id function accepts length and generates alpha-numeric randomstring
@@ -17,9 +18,63 @@ function generate_id(maxLength) {
     if (idFound)  return generate_id(maxLength);
     else  return result;
   }
+   /*
+    The validateTaskData function accepts body object from client
+     and performs data-validations like below :
+     Validations
+            _id*    -> Unique
+                    -> alpha-numeric-string with max length as 10 characters
 
+            taskname*
+                    -> Max Length  : 200 Chars 
+                    -> Min Length     : 5 Chars
+
+            deadline*
+                    -> deadline value must be in date-time format
+                    -> deadline input date&time cannot be backdated
+                    -> deadline input date&time cannot be within in next 15 mins
+                    -> deadline input date&time must be within 30 days from current time&date.
+                    -> deadline input date&time must be stored in GMT +0000 (UTC)
+
+            status*
+                    -> must be data type of boolean
+*/
+
+function validateTaskData(body) {
+  let { taskname, deadline, status } = body;
+  let error = {};
+  if (!taskname || !deadline) {
+      error.message = "Taskname and/or deadline are required fields."
+      return error;
+  }
+  //Verify taskname : negative check
+  if (taskname.length < 5 || taskname.length > 200) {
+      error.message = "Taskname must be > 5 Chars and < 200 Chars"
+  }
+  //Verify deadline
+  if (isNaN(Date.parse(deadline))) {
+      error.message = "Enter Valid Timestamp for deadline"
+      return error;
+  }
+  let liveTime = new Date(); //Live Time
+  let inputTime = new Date(deadline); //Input Time in UTC+0000
+
+  let diff_in_milliseconds = inputTime - liveTime;
+  let diff_in_minutes = diff_in_milliseconds / (1000 * 60);
+  let diff_in_days = diff_in_milliseconds / (1000 * 60 * 60 * 24);
+
+  if (diff_in_minutes < 15 || diff_in_days > 30) {
+      error.message = "Deadline cannot be within next 15 mins OR must within next 30 days OR backdated"
+  }
+  // //Verify status
+  if (status && typeof status !== 'boolean') {
+      error.message = "Status must be a boolean"
+  }
+  return error;
+}
+  
 
   export  {
-    generate_id
+    generate_id, validateTaskData
   }
   
