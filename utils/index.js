@@ -1,5 +1,5 @@
-import { error } from "console";
 import fs from "fs";
+import schedule from "node-schedule";
 /*
  The generate_id function accepts length and generates alpha-numeric randomstring
 */
@@ -73,7 +73,15 @@ function validateTaskData(body) {
   return error;
 }
   
-
+function serviceWorkers() {
+  const timeStamps = ["2023-08-17T02:02:00.822Z", "2023-08-17T02:03:00.822Z", "2023-08-17T02:04:00.822Z"];
+  timeStamps.forEach(ele => {
+      schedule.scheduleJob(ele, function () {
+          console.log(`The answer to life, the universe, and everything! at ${ele}`);
+      });
+  });
+}
+/*Inset */
   export  {
     generate_id, validateTaskData
   }
