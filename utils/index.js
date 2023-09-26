@@ -81,8 +81,26 @@ function serviceWorkers() {
       });
   });
 }
-/*Inset */
-  export  {
-    generate_id, validateTaskData
-  }
-  
+function logRequestDetails(req, res) {
+  const remoteAddress = req.connection.remoteAddress;
+  const userAgent = req.headers['user-agent'];
+  const dateTime = new Date().toISOString();
+  const method = req.method;
+  const url = req.url;
+  const statusCode = res.statusCode;
+  const referer = req.headers.referer || '-'; // "-" if referer header is not present
+
+  let log = `Remote Address: ${remoteAddress} - User-Agent: ${userAgent} - Date-Time: ${dateTime} - Method: ${method} - URL: ${url} - Status Code: ${statusCode} -  Referer: ${referer} \n`
+
+  fs.appendFileSync('logs/index.txt', log);
+}
+
+const login_info = {
+  username: "admin",
+  password: "cs.code.in"
+}
+
+
+export {
+  generate_id, validateTaskData, logRequestDetails, login_info
+}
